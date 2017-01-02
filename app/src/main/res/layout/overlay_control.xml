@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerVertical="true">
+
+    <LinearLayout
+        android:layout_width="25dp"
+        android:layout_height="100dp"
+        android:layout_centerVertical="true">
+
+        <View
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/round" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="25dp"
+        android:background="@drawable/rounded_rect"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/mute"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/ic_mute_disable" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccentDisabled" />
+
+        <ImageView
+            android:id="@+id/volume_dec"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/ic_sound_decrease" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccentDisabled" />
+
+        <ImageView
+            android:id="@+id/pause"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/ic_pause_on_card" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccentDisabled" />
+
+        <ImageView
+            android:id="@+id/volume_inc"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/ic_sound_increase" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

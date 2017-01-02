@@ -1,0 +1,8 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="orientation">
+      <item name="android:orientation">vertical</item>
+    </style>
+
+</resources>

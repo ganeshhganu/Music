@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <musiq.my.com.musiq.common.ui.custom.view.GlideImageView
+        android:id="@+id/album_art"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/touch_state"
+        android:duplicateParentState="true"
+        android:src="@mipmap/ic_launcher" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
+            android:id="@+id/album_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+
+        <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
+            android:id="@+id/album_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/album_name"
+            android:layout_toLeftOf="@+id/no_of_songs"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
+            android:id="@+id/no_of_songs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/album_name"
+            android:layout_marginLeft="10dp"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+
+</RelativeLayout>
