@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
@@ -30,8 +29,8 @@ public class WaveformView extends View {
     private float density;
     private float primaryWaveLineWidth;
     private float secondaryWaveLineWidth;
-    Paint mPaintColor;
-    Rect rect;
+    private Paint mPaintColor;
+    private Path mPath;
     boolean isStraightLine = false;
 
     public WaveformView(Context context) {
@@ -85,7 +84,6 @@ public class WaveformView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        rect = new Rect(0, 0, canvas.getWidth(), canvas.getWidth());
         if (!isStraightLine) {
             for (int i = 0; i < numberOfWaves; i++) {
                 mPaintColor.setStrokeWidth(i == 0 ? primaryWaveLineWidth : secondaryWaveLineWidth);
@@ -96,9 +94,11 @@ public class WaveformView extends View {
                 float maxAmplitude = halfHeight - 4.0f;
                 float progress = 1.0f - (float) i / this.numberOfWaves;
                 float normedAmplitude = (1.5f * progress - 0.5f) * this.amplitude;
-                Path path = new Path();
-
-                float multiplier = Math.min(1.0f, (progress / 3.0f * 2.0f) + (1.0f / 3.0f));
+                if (mPath == null) {
+                    mPath = new Path();
+                }else{
+                    mPath.reset();
+                }
 
                 for (float x = 0; x < width + density; x += density) {
                     // We use a parable to scale the sinus wave, that has its peak in the middle of the view.
@@ -107,12 +107,12 @@ public class WaveformView extends View {
                     float y = (float) (scaling * maxAmplitude * normedAmplitude * Math.sin(2 * Math.PI * (x / width) * frequency + phase) + halfHeight);
 
                     if (x == 0) {
-                        path.moveTo(x, y);
+                        mPath.moveTo(x, y);
                     } else {
-                        path.lineTo(x, y);
+                        mPath.lineTo(x, y);
                     }
                 }
-                canvas.drawPath(path, mPaintColor);
+                canvas.drawPath(mPath, mPaintColor);
             }
         }
         this.phase += phaseShift;

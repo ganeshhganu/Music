@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.activity.MainActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +23,7 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activity.AlbumListActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|keyboard"
             android:screenOrientation="portrait"/>
         <activity android:name=".ui.activity.SongListActivity"
             android:screenOrientation="portrait"/>

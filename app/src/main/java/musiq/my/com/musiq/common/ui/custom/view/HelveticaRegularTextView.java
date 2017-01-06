@@ -13,23 +13,19 @@ public class HelveticaRegularTextView extends TextView {
 
     public HelveticaRegularTextView(Context context) {
         super(context);
-        init();
     }
 
     public HelveticaRegularTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public HelveticaRegularTextView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
-    private void init() {
-        Typeface tf = Typeface.createFromAsset(getContext().getAssets(),
-                "helevetica_regular" + ".ttf");
-        setTypeface(tf);
+    @Override
+    public void setTypeface(Typeface tf) {
+        super.setTypeface(FontCache.getFont(getContext(), "helevetica_regular.ttf"));
     }
 
 }

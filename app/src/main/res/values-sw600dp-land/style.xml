@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="orientation">
+      <item name="android:orientation">horizontal</item>
+
+    </style>
+
+    <style name="weight">
+        <item name="android:layout_weight">1</item>
+    </style>
+
+</resources>

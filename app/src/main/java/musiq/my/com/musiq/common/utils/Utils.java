@@ -32,16 +32,15 @@ public class Utils {
         String selection = null;
         String[] selectionArgs = null;
         String sortOrder = Media.ALBUM + " ASC";
-        return resolver.query(Albums.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs, sortOrder);
+        return resolver.query(Albums.EXTERNAL_CONTENT_URI, projection, null, null, sortOrder);
     }
 
 
     public static Cursor getSongsInAlbum(Context ctx, int albumId) {
         ContentResolver resolver = ctx.getContentResolver();
         String selection = Albums.ALBUM_ID + "=" + albumId;
-        String[] selectionArgs = null;
         String sortOrder = Media.ALBUM + " ASC";
-        return resolver.query(Media.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, sortOrder);
+        return resolver.query(Media.EXTERNAL_CONTENT_URI, null, selection, null, sortOrder);
     }
 
 
