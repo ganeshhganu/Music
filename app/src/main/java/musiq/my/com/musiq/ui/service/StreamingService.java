@@ -87,6 +87,9 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     public void onPrepared(MediaPlayer mp) {
         mp.start();
         mMediaPlayer.setOnCompletionListener(this);
+        if (!isAutoChange) {
+            onCompletion(mp);
+        }
     }
 
     @Override
