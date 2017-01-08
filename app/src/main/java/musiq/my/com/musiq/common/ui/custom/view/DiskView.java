@@ -32,7 +32,7 @@ import musiq.my.com.musiq.R;
  * Created by tringapps-admin on 28/12/16.
  */
 
-public class DiskView extends ImageView {
+public class DiskView extends ImageView implements ValueAnimator.AnimatorUpdateListener {
 
     private ValueAnimator animator;
     private Bitmap bitmap;
@@ -128,12 +128,7 @@ public class DiskView extends ImageView {
         valueAnimatorWeakReference.get().setDuration(2500);
         valueAnimatorWeakReference.get().setFloatValues(360);
         valueAnimatorWeakReference.get().setInterpolator(new LinearInterpolator());
-        valueAnimatorWeakReference.get().addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                DiskView.this.setRotation((Float) animation.getAnimatedValue());
-            }
-        });
+        valueAnimatorWeakReference.get().addUpdateListener(this);
         valueAnimatorWeakReference.get().start();
     }
 
@@ -165,5 +160,10 @@ public class DiskView extends ImageView {
                 return null;
             }
         };
+    }
+
+    @Override
+    public void onAnimationUpdate(ValueAnimator animation) {
+        DiskView.this.setRotation((Float) animation.getAnimatedValue());
     }
 }
