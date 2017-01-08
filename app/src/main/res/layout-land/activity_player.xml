@@ -39,29 +39,29 @@
                     android:id="@+id/track_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="39dp"
                     android:gravity="center"
                     android:textColor="@color/light_gray"
-                    android:layout_alignParentTop="true"
                     android:textSize="24sp" />
 
                 <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
                     android:id="@+id/artist_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/track_name"
+                    android:layout_centerHorizontal="true"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="6dp"
                     android:gravity="center"
-                    android:layout_centerHorizontal="true"
-                    android:layout_below="@+id/track_name"
                     android:textColor="@android:color/white"
                     android:textSize="14sp" />
 
                 <RelativeLayout
-                    android:layout_below="@+id/artist_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/artist_name"
                     android:layout_marginTop="16dp"
                     android:gravity="center"
                     android:orientation="horizontal">
@@ -98,6 +98,23 @@
                     android:layout_alignParentBottom="true"
                     android:background="@drawable/left_top_rounded_rect"
                     android:gravity="center">
+
+                    <ProgressBar
+                        android:id="@+id/track_progress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerInParent="true"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:padding="0dp" />
+
+                    <musiq.my.com.musiq.common.ui.custom.view.WaveformView
+                        android:id="@+id/wave_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="85dp" />
 
                     <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
                         android:id="@+id/now_playing"
@@ -162,34 +179,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true" />
+
             </RelativeLayout>
 
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:gravity="bottom">
-
-            <musiq.my.com.musiq.common.ui.custom.view.WaveformView
-                android:id="@+id/wave_view"
-                android:layout_width="match_parent"
-                android:layout_height="85dp" />
-
-            <ProgressBar
-                android:id="@+id/track_progress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:layout_centerInParent="true"
-                android:clickable="false"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:padding="0dp" />
-
-        </RelativeLayout>
 
         <musiq.my.com.musiq.common.ui.custom.view.Playlist
             android:id="@+id/playlist_view"

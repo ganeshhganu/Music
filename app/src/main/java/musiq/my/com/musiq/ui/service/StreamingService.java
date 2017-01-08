@@ -1,23 +1,35 @@
 package musiq.my.com.musiq.ui.service;
 
+import android.annotation.TargetApi;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.v4.app.NotificationCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import java.io.IOException;
 
+import musiq.my.com.musiq.R;
 import musiq.my.com.musiq.common.AppConstants;
 import musiq.my.com.musiq.common.utils.Utils;
 import musiq.my.com.musiq.manager.preference.PreferenceManager;
 import musiq.my.com.musiq.ui.MediaCallback;
+import musiq.my.com.musiq.ui.activity.PlayerActivity;
 
 public class StreamingService extends Service implements AudioManager.OnAudioFocusChangeListener,
         MediaPlayer.OnPreparedListener,
@@ -30,12 +42,18 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     private int mCurrentPosition;
     private MediaCallback mMediaCallback;
     private boolean isAutoChange = true;
+    private TelephonyManager mgr;
 
     public StreamingService() {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        if (mgr != null) {
+            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        }
+        initNotificationBuilder();
         return mBinder;
     }
 
@@ -77,11 +95,11 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
                     location);
         }
 
-        if(cursor.getCount() == location){
+        if (cursor.getCount() == location) {
             if (mMediaCallback != null) {
                 mMediaCallback.onAlbumEnd();
             }
-        }else{
+        } else {
             if (mMediaCallback != null) {
                 mMediaCallback.onSongChange();
             }
@@ -106,6 +124,9 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
 
     @Override
     public void onDestroy() {
+        if (mgr != null) {
+            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+        }
     }
 
     @Override
@@ -220,4 +241,64 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
         }
     }
 
+    PhoneStateListener phoneStateListener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            if (state == TelephonyManager.CALL_STATE_RINGING) {
+                //Incoming call: Pause music
+                pause();
+            } else if (state == TelephonyManager.CALL_STATE_IDLE) {
+                //Not in call: Play music
+                resume();
+            } else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
+                //A call is dialing, active or on hold
+                pause();
+            }
+            super.onCallStateChanged(state, incomingNumber);
+        }
+    };
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void initNotificationBuilder() {
+
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),
+                R.layout.notification_inflater);
+
+        Intent yesReceive = new Intent();
+        yesReceive.setAction("YES_ACTION");
+        PendingIntent pendingIntentYes = PendingIntent.getBroadcast(this, 12345, yesReceive, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_logo)
+                        .setOngoing(true)
+                        .addAction(R.drawable.btn_playback_rew_normal_jb_dark_translucent, "Yes", pendingIntentYes)
+                        .addAction(R.drawable.ic_fab_pause, "Yes", pendingIntentYes)
+                        .addAction(R.drawable.btn_playback_ff_normal_jb_dark_translucent, "Yes", pendingIntentYes)
+                        .setContent(remoteViews);
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, PlayerActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(PlayerActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(111, mBuilder.build());
+
+    }
 }

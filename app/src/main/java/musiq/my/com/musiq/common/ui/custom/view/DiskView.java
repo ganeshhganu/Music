@@ -1,6 +1,7 @@
 package musiq.my.com.musiq.common.ui.custom.view;
 
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -57,8 +58,9 @@ public class DiskView extends ImageView implements ValueAnimator.AnimatorUpdateL
         init();
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void init() {
-        bitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.vinyle_rings)).getBitmap();
+        bitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.vinyle_rings, null)).getBitmap();
         animator = new ValueAnimator();
         valueAnimatorWeakReference = new WeakReference<>(animator);
         paint1 = new Paint();
