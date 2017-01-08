@@ -36,30 +36,30 @@
                 android:id="@+id/previous"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_below="@+id/now_playing"
-                android:src="@drawable/btn_playback_rew_normal_jb_dark_translucent"
                 android:layout_alignParentLeft="true"
+                android:layout_below="@+id/now_playing"
                 android:layout_marginTop="15dp"
                 android:layout_toLeftOf="@+id/pause"
-                android:layout_toStartOf="@+id/pause" />
+                android:layout_toStartOf="@+id/pause"
+                android:src="@drawable/btn_playback_rew_normal_jb_dark_translucent" />
 
             <ImageView
                 android:id="@+id/next"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_alignParentRight="true"
                 android:layout_below="@+id/now_playing"
                 android:layout_marginTop="15dp"
                 android:layout_toRightOf="@+id/pause"
-                android:layout_alignParentRight="true"
                 android:src="@drawable/btn_playback_ff_normal_jb_dark_translucent" />
 
             <ImageView
                 android:id="@+id/pause"
                 android:layout_width="62dp"
                 android:layout_height="62dp"
-                android:src="@drawable/ic_fab_pause"
+                android:layout_below="@+id/now_playing"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@+id/now_playing"/>
+                android:src="@drawable/ic_fab_pause" />
         </RelativeLayout>
 
 
@@ -82,7 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/media_controller"
-            android:background="@color/transparentWhite" />
+            android:background="@color/transparentBlack" />
 
     </RelativeLayout>
 

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:glide="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_player"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="true"
+    tools:context="musiq.my.com.musiq.ui.activity.PlayerActivity">
+
+
+    <musiq.my.com.musiq.common.ui.custom.view.GlideImageView
+        android:id="@+id/big_album_art"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        glide:size="@string/fill" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="bottom">
+
+            <musiq.my.com.musiq.common.ui.custom.view.WaveformView
+                android:id="@+id/wave_view"
+                android:layout_width="match_parent"
+                android:layout_height="85dp" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:id="@+id/track_progress"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_centerInParent="true"
+                android:clickable="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:padding="0dp"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="24dp"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <musiq.my.com.musiq.common.ui.custom.view.HelveticaRegularTextView
+                    android:id="@+id/track_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="39dp"
+                    android:gravity="center"
+                    android:textColor="@color/light_gray"
+                    android:textSize="24sp" />
+
+                <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
+                    android:id="@+id/artist_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
+                        android:id="@+id/track_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="00:00"
+                        android:textColor="@color/light_gray"
+                        android:textSize="32sp" />
+
+                    <musiq.my.com.musiq.common.ui.custom.view.HelveticaTextView
+                        android:id="@+id/total_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/track_duration"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginRight="15dp"
+                        android:layout_toLeftOf="@+id/track_duration"
+                        android:gravity="center"
+                        android:text="00:00"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="10dp"
+                    android:padding="5dp"
+                    android:src="@drawable/btn_notification_settings" />
+
+
+                <musiq.my.com.musiq.common.ui.custom.view.DiskPlayer
+                    android:id="@+id/disk_player"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <musiq.my.com.musiq.common.ui.custom.view.Playlist
+            android:id="@+id/playlist_view"
+            android:layout_width="390dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical|left"
+            android:layout_marginRight="25dp" />
+
+    </FrameLayout>
+
+</FrameLayout>

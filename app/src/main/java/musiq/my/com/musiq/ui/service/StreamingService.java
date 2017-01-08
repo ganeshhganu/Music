@@ -77,9 +77,16 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
                     location);
         }
 
-        if (mMediaCallback != null) {
-            mMediaCallback.onSongChange();
+        if(cursor.getCount() == location){
+            if (mMediaCallback != null) {
+                mMediaCallback.onAlbumEnd();
+            }
+        }else{
+            if (mMediaCallback != null) {
+                mMediaCallback.onSongChange();
+            }
         }
+
         isAutoChange = true;
     }
 

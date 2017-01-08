@@ -24,6 +24,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
+import java.lang.ref.WeakReference;
+
 import musiq.my.com.musiq.R;
 
 /**
@@ -34,6 +36,11 @@ public class DiskView extends ImageView {
 
     private ValueAnimator animator;
     private Bitmap bitmap;
+    private Paint paint1;
+    private Paint imagePaint;
+    private PorterDuffXfermode mask;
+    private WeakReference<ValueAnimator> valueAnimatorWeakReference;
+    private WeakReference<Paint> outlineWeakReference, imagePaintWeakReference;
 
     public DiskView(Context context) {
         super(context);
@@ -53,6 +60,12 @@ public class DiskView extends ImageView {
     private void init() {
         bitmap = ((BitmapDrawable) getResources().getDrawable(R.drawable.vinyle_rings)).getBitmap();
         animator = new ValueAnimator();
+        valueAnimatorWeakReference = new WeakReference<>(animator);
+        paint1 = new Paint();
+        imagePaint = new Paint();
+        outlineWeakReference = new WeakReference<>(paint1);
+        imagePaintWeakReference = new WeakReference<>(imagePaint);
+        mask = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
     }
 
     public void loadRoundImage(final Context context, Uri uri) {
@@ -81,19 +94,17 @@ public class DiskView extends ImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Paint paint1 = new Paint();
-        paint1.setColor(Color.BLACK);
-        paint1.setStyle(Paint.Style.STROKE);
-        paint1.setStrokeWidth(12f);
-        canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2, (canvas.getWidth() / 2) - (12f/2), paint1);
+        outlineWeakReference.get().setColor(Color.BLACK);
+        outlineWeakReference.get().setStyle(Paint.Style.STROKE);
+        outlineWeakReference.get().setStrokeWidth(12f);
+        canvas.drawCircle(canvas.getWidth() / 2, canvas.getHeight() / 2, (canvas.getWidth() / 2) - (12f / 2), outlineWeakReference.get());
 
-        Paint imagePaint = new Paint();
-        imagePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        imagePaintWeakReference.get().setXfermode(mask);
 
         canvas.drawBitmap(getResizedBitmap(bitmap, canvas.getWidth(), canvas.getHeight()),
-                canvas.getClipBounds().left,
-                canvas.getClipBounds().top,
-                imagePaint);
+                0,
+                0,
+                imagePaintWeakReference.get());
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
@@ -113,31 +124,31 @@ public class DiskView extends ImageView {
     }
 
     public void startAnimate() {
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setDuration(2700);
-        animator.setFloatValues(360);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        valueAnimatorWeakReference.get().setRepeatCount(ValueAnimator.INFINITE);
+        valueAnimatorWeakReference.get().setDuration(2500);
+        valueAnimatorWeakReference.get().setFloatValues(360);
+        valueAnimatorWeakReference.get().setInterpolator(new LinearInterpolator());
+        valueAnimatorWeakReference.get().addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 DiskView.this.setRotation((Float) animation.getAnimatedValue());
             }
         });
-        animator.start();
+        valueAnimatorWeakReference.get().start();
     }
 
     public void pauseAnimation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (animator != null && animator.isRunning()) {
-                animator.pause();
+            if (valueAnimatorWeakReference.get() != null && valueAnimatorWeakReference.get().isRunning()) {
+                valueAnimatorWeakReference.get().pause();
             }
         }
     }
 
     public void resumeAnimation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (animator != null && animator.isPaused()) {
-                animator.resume();
+            if (valueAnimatorWeakReference.get() != null && valueAnimatorWeakReference.get().isPaused()) {
+                valueAnimatorWeakReference.get().resume();
             }
         }
     }

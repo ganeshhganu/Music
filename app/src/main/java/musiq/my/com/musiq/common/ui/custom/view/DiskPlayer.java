@@ -16,6 +16,8 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.lang.ref.WeakReference;
+
 import musiq.my.com.musiq.R;
 import musiq.my.com.musiq.ui.MediaCallback;
 import musiq.my.com.musiq.ui.service.StreamingService;
@@ -24,15 +26,14 @@ import musiq.my.com.musiq.ui.service.StreamingService;
  * Created by tringapps-admin on 28/12/16.
  */
 
-public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekCompleteListener,
-        MediaPlayer.OnCompletionListener {
+public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekCompleteListener {
 
     private DiskView mDiskView;
     private ImageView mDiskArm, mIndicator;
     private ValueAnimator animator;
+    private WeakReference<ValueAnimator> animatorWeakReference;
     private StreamingService mStreamingService;
     private GestureDetector mDetector;
-    private GestureDetector.SimpleOnGestureListener mListener;
     private MediaCallback mPlayBackCallback;
 
     public DiskPlayer(Context context) {
@@ -52,7 +53,8 @@ public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekComp
 
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.disk_player, this);
-
+        animator = new ValueAnimator();
+        animatorWeakReference = new WeakReference<>(animator);
     }
 
     @Override
@@ -102,11 +104,10 @@ public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekComp
     public void placeArm(final float value, final boolean reverse) {
         mDiskArm.setPivotX(mDiskArm.getWidth() / 2);
         mDiskArm.setPivotY(mDiskArm.getWidth() / 2);
-        animator = new ValueAnimator();
-        animator.setDuration(700);
-        animator.setFloatValues(value);
-        animator.setInterpolator(new FastOutSlowInInterpolator());
-        animator.addListener(new AnimatorListenerAdapter() {
+        animatorWeakReference.get().setDuration(700);
+        animatorWeakReference.get().setFloatValues(value);
+        animatorWeakReference.get().setInterpolator(new FastOutSlowInInterpolator());
+        animatorWeakReference.get().addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -117,7 +118,7 @@ public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekComp
                 }
             }
         });
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        animatorWeakReference.get().addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float animatedValue = reverse ?
@@ -126,7 +127,7 @@ public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekComp
                 mDiskArm.setRotation(animatedValue);
             }
         });
-        animator.start();
+        animatorWeakReference.get().start();
     }
 
     private double startAngle, previousAngle;
@@ -161,9 +162,9 @@ public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekComp
                 }
                 startAngle = currentAngle;
                 if (currentAngle - previousAngle > 300) {
-                    count += 10000;
+                    count += 15000;
                 } else if (Math.abs(previousAngle - currentAngle) > 300) {
-                    count -= 10000;
+                    count -= 15000;
                 }
                 previousAngle = currentAngle;
                 return true;
@@ -218,7 +219,6 @@ public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekComp
     public void setStreamingService(StreamingService streamingService) {
         this.mStreamingService = streamingService;
         this.mStreamingService.getMediaPlayer().setOnSeekCompleteListener(this);
-        this.mStreamingService.getMediaPlayer().setOnCompletionListener(this);
     }
 
     @Override
@@ -230,11 +230,6 @@ public class DiskPlayer extends RelativeLayout implements MediaPlayer.OnSeekComp
     public void resume() {
         updateIndicator(true);
         placeArm(20f, false);
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-//        pause();
     }
 
     public void pause() {

@@ -33,9 +33,9 @@ public class Playlist extends RelativeLayout implements GestureDetector.OnGestur
     private RelativeLayout mContainer;
     private ValueAnimator mAnimator;
     private RecyclerView mPlaylist;
-    private ImageView mDrawer, mPreviousTrack, mNextTrack, mPlay;
+    private ImageView mDrawer;
+    private ImageView mPlay;
     private StreamingService mService;
-    private int currentPosition, albumId, mediaId;
 
     public Playlist(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,8 +53,8 @@ public class Playlist extends RelativeLayout implements GestureDetector.OnGestur
         super.onFinishInflate();
         mContainer = (RelativeLayout) findViewById(R.id.container);
         mDrawer = (ImageView) findViewById(R.id.drawer_background);
-        mPreviousTrack = (ImageView) findViewById(R.id.previous);
-        mNextTrack = (ImageView) findViewById(R.id.next);
+        ImageView mPreviousTrack = (ImageView) findViewById(R.id.previous);
+        ImageView mNextTrack = (ImageView) findViewById(R.id.next);
         mPlay = (ImageView) findViewById(R.id.pause);
         mPlaylist = (RecyclerView) findViewById(R.id.playlist);
         mPlaylist.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -133,7 +133,7 @@ public class Playlist extends RelativeLayout implements GestureDetector.OnGestur
         return true;
     }
 
-    private void toggleDrawer(final boolean collapse) {
+    public void toggleDrawer(final boolean collapse) {
         mAnimator.setDuration(400);
         mAnimator.setFloatValues(-mContainer.getWidth());
         mAnimator.setInterpolator(new AccelerateInterpolator());
@@ -165,8 +165,8 @@ public class Playlist extends RelativeLayout implements GestureDetector.OnGestur
 
             case R.id.next:
 
-                currentPosition = PreferenceManager.getInt(getContext(), AppConstants.POSITION) + 1;
-                albumId = PreferenceManager.getInt(getContext(), AppConstants.ALBUM_ID);
+                int currentPosition = PreferenceManager.getInt(getContext(), AppConstants.POSITION) + 1;
+                int albumId = PreferenceManager.getInt(getContext(), AppConstants.ALBUM_ID);
                 Cursor nextCursor = Utils.getSongsInAlbum(getContext(), albumId);
                 if (nextCursor.getCount() > currentPosition) {
                     nextCursor.moveToPosition(currentPosition);

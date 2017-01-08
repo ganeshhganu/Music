@@ -15,7 +15,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.SeekBar;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
@@ -45,7 +45,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     private Handler mHandler;
     private WaveformView mWaveformView;
     private Cursor mCursor;
-    private SeekBar mTrackProgress;
+    private ProgressBar mTrackProgress;
     private Playlist mPlaylist;
     private SongListAdapter mAdapter;
 
@@ -64,7 +64,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
         mDuration = (TextView) findViewById(R.id.track_duration);
         mTrackDuration = (TextView) findViewById(R.id.total_duration);
         mWaveformView = (WaveformView) findViewById(R.id.wave_view);
-        mTrackProgress = (SeekBar) findViewById(R.id.track_progress);
+        mTrackProgress = (ProgressBar) findViewById(R.id.track_progress);
         mPlaylist = (Playlist) findViewById(R.id.playlist_view);
 
         mTrackProgress.setMax(100);
@@ -172,6 +172,8 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     @Override
     public void onSongChange() {
         Log.e("onSongChange", "-------------");
+        int mediaID = PreferenceManager.getInt(getApplicationContext(), AppConstants.MEDIA_ID);
+        getIntent().putExtra(AppConstants.MEDIA_ID, mediaID);
         updateUi();
     }
 
@@ -193,6 +195,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     public void onAlbumEnd() {
         Log.e("onAlbumEnd", "-------------");
         mDiskPlayer.pause();
+        mWaveformView.updateAmplitude(0f, true);
     }
 
     @Override
@@ -213,6 +216,8 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
                     position);
 
             updateUi();
+            onSongChange();
+            mPlaylist.toggleDrawer(true);
         }
     }
 }

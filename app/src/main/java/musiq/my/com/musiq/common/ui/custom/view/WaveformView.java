@@ -1,12 +1,10 @@
 package musiq.my.com.musiq.common.ui.custom.view;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -48,12 +46,6 @@ public class WaveformView extends View {
         setUp();
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public WaveformView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        setUp();
-    }
-
     private void setUp() {
         this.frequency = kDefaultFrequency;
 
@@ -75,10 +67,8 @@ public class WaveformView extends View {
     }
 
     public void updateAmplitude(float level, boolean isStraightLine) {
-        /*this.phase += phaseShift;*/
         this.amplitude = Math.max(level, idleAmplitude);
         this.isStraightLine = isStraightLine;
-        /*invalidate();*/
     }
 
 
@@ -96,7 +86,7 @@ public class WaveformView extends View {
                 float normedAmplitude = (1.5f * progress - 0.5f) * this.amplitude;
                 if (mPath == null) {
                     mPath = new Path();
-                }else{
+                } else {
                     mPath.reset();
                 }
 

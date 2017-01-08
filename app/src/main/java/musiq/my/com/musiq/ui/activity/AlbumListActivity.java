@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 
 import musiq.my.com.musiq.R;
@@ -22,6 +23,7 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
 
     private RecyclerView mSongList;
     private FloatingActionButton mNowPlaying;
+    private String TAG = "AlbumListActivity";
 
 
     @Override
@@ -36,6 +38,9 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
         mSongList = (RecyclerView) findViewById(R.id.song_list);
         mNowPlaying = (FloatingActionButton) findViewById(R.id.now_playing);
         mNowPlaying.setOnClickListener(this);
+        Display getOrient = getWindowManager().getDefaultDisplay();
+        int orientation = getOrient.getRotation();
+        Log.e(TAG, "init: "+orientation);
         mSongList.setLayoutManager(new GridLayoutManager(this, 2));
         mSongList.setAdapter(new AlbumListAdapter(cursor));
     }
