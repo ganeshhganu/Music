@@ -45,7 +45,7 @@ public class GlideImageView extends ImageView {
                 super.onMeasure(heightMeasureSpec, heightMeasureSpec);
             }
         } else {
-            super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
     }
 

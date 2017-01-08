@@ -1,13 +1,11 @@
 package musiq.my.com.musiq.ui.activity;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 
@@ -21,8 +19,6 @@ import musiq.my.com.musiq.ui.adapter.AlbumListAdapter;
 
 public class AlbumListActivity extends BaseActivity implements View.OnClickListener {
 
-    private RecyclerView mSongList;
-    private FloatingActionButton mNowPlaying;
     private String TAG = "AlbumListActivity";
 
 
@@ -35,13 +31,13 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
 
     private void init() {
         Cursor cursor = Utils.getAudioList(this);
-        mSongList = (RecyclerView) findViewById(R.id.song_list);
-        mNowPlaying = (FloatingActionButton) findViewById(R.id.now_playing);
+        RecyclerView mSongList = (RecyclerView) findViewById(R.id.song_list);
+        FloatingActionButton mNowPlaying = (FloatingActionButton) findViewById(R.id.now_playing);
         mNowPlaying.setOnClickListener(this);
         Display getOrient = getWindowManager().getDefaultDisplay();
         int orientation = getOrient.getRotation();
-        Log.e(TAG, "init: "+orientation);
-        mSongList.setLayoutManager(new GridLayoutManager(this, 2));
+        int gridSize = (orientation ==1||orientation ==3)?3:2;
+        mSongList.setLayoutManager(new GridLayoutManager(this, gridSize));
         mSongList.setAdapter(new AlbumListAdapter(cursor));
     }
 
@@ -57,19 +53,5 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
                 Launcher.launchPlayer(this, intent);
                 break;
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Log.e("TAG", "onConfigurationChanged: ");
-        GridLayoutManager manager = (GridLayoutManager) mSongList.getLayoutManager();
-        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            manager.setSpanCount(3);
-        }else{
-            manager.setSpanCount(2);
-        }
-
-
     }
 }

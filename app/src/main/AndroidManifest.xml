@@ -21,11 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.PlayerActivity" />
-        <activity
-            android:name=".ui.activity.AlbumListActivity"/>
-        <activity
-            android:name=".ui.activity.SongListActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".ui.activity.AlbumListActivity" />
+        <activity android:name=".ui.activity.SongListActivity" />
 
         <service
             android:name=".ui.service.StreamingService"
