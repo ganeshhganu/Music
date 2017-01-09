@@ -43,6 +43,8 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     private MediaCallback mMediaCallback;
     private boolean isAutoChange = true;
     private TelephonyManager mgr;
+    private boolean isPaused;
+    private NotificationManager mNotificationManager;
 
     public StreamingService() {
     }
@@ -124,6 +126,9 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
 
     @Override
     public void onDestroy() {
+        if (mNotificationManager != null) {
+            mNotificationManager.cancel(111);
+        }
         if (mgr != null) {
             mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
         }
@@ -171,6 +176,7 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     public void pause() {
         if (mMediaPlayer != null &&
                 mMediaPlayer.isPlaying()) {
+            isPaused = true;
             mMediaPlayer.pause();
             if (mMediaCallback != null) {
                 mMediaCallback.onMediaPaused();
@@ -181,6 +187,7 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
 
     public void resume() {
         if (mMediaPlayer != null) {
+            isPaused = false;
             if (mCurrentPosition != 0) {
                 mMediaPlayer.seekTo(mCurrentPosition);
             }
@@ -235,6 +242,10 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
         isAutoChange = autoChange;
     }
 
+    public boolean isPaused() {
+        return isPaused;
+    }
+
     public class LocalBinder extends Binder {
         public StreamingService getService() {
             return StreamingService.this;
@@ -273,9 +284,9 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_logo)
                         .setOngoing(true)
-                        .addAction(R.drawable.btn_playback_rew_normal_jb_dark_translucent, "Yes", pendingIntentYes)
+                        /*.addAction(R.drawable.btn_playback_rew_normal_jb_dark_translucent, "Yes", pendingIntentYes)
                         .addAction(R.drawable.ic_fab_pause, "Yes", pendingIntentYes)
-                        .addAction(R.drawable.btn_playback_ff_normal_jb_dark_translucent, "Yes", pendingIntentYes)
+                        .addAction(R.drawable.btn_playback_ff_normal_jb_dark_translucent, "Yes", pendingIntentYes)*/
                         .setContent(remoteViews);
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, PlayerActivity.class);
@@ -295,10 +306,9 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
         mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
+        mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
         mNotificationManager.notify(111, mBuilder.build());
-
     }
 }
