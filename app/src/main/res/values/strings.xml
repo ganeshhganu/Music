@@ -4,5 +4,6 @@
     <string name="square">square</string>
     <string name="fill">fill</string>
     <string name="now_playing">Now Playing</string>
+    <string name="now_playing_colon">Now Playing :</string>
     <string name="search">Search</string>
 </resources>

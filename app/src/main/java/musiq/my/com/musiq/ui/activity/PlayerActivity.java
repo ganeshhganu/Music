@@ -48,13 +48,14 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     private Cursor mCursor;
     private ProgressBar mTrackProgress;
     private Playlist mPlaylist;
+    private boolean isBound;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         initView();
+        super.onCreate(savedInstanceState);
     }
 
     private void initView() {
@@ -120,6 +121,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
+        isBound = true;
         if (service != null) {
             mService = ((StreamingService.LocalBinder) service).getService();
             mService.setMediaCallback(this);
@@ -159,7 +161,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-
+        isBound = false;
     }
 
     @Override
@@ -171,7 +173,9 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
             mCursor.close();
         }
 
-        unbindService(this);
+        if (isBound) {
+            unbindService(this);
+        }
         super.onDestroy();
     }
 

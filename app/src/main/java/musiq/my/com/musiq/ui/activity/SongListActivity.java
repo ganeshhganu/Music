@@ -31,9 +31,9 @@ public class SongListActivity extends BaseActivity implements SongListAdapter.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.song_list);
         initView();
+        super.onCreate(savedInstanceState);
     }
 
     private void initView() {
