@@ -44,7 +44,7 @@ public class PreferenceManager {
 
     public static boolean getBoolean(Context ctx, String key) {
         SharedPreferences preferences = getPreference(ctx);
-        return preferences.getBoolean(key, true);
+        return preferences.getBoolean(key, false);
     }
 
 

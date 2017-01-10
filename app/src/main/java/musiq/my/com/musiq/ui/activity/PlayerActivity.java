@@ -110,7 +110,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     private void loadBackgroundImage() {
         final Uri sArtworkUri = Uri
                 .parse("content://media/external/audio/albumart");
-        if (mCursor != null) {
+        if (mCursor != null && mCursor.getCount() > 0) {
             Uri uri = ContentUris.withAppendedId(sArtworkUri, mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID)));
             Utils.loadBlurImage(this, uri, mBigAlbumArt);
             Utils.loadBlurImage(this, uri, mPlaylist.getDrawer());
@@ -127,14 +127,12 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
             mService.setMediaCallback(this);
 
             if (PreferenceManager.getInt(getApplicationContext(), AppConstants.MEDIA_ID) !=
-                    getIntent().getIntExtra(AppConstants.MEDIA_ID, -1)) {
+                    getIntent().getIntExtra(AppConstants.MEDIA_ID, -1) ||
+                    (!PreferenceManager.getBoolean(this, AppConstants.IS_PLAYING) &&
+                            getIntent().getExtras().getString(AppConstants.IS_FROM).equals(AppConstants.HOME))) {
                 mService.start(getIntent().getIntExtra(AppConstants.MEDIA_ID, -1),
                         getIntent().getIntExtra(AppConstants.ALBUM_ID, -1),
                         getIntent().getIntExtra(AppConstants.POSITION, -1));
-            } else {
-                if (!PreferenceManager.getBoolean(this, AppConstants.IS_PLAYING)) {
-                    mService.resume();
-                }
             }
             updateUi();
         }
@@ -145,7 +143,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
         mPlaylist.setService(mService);
 
         mCursor = mService.getCursor();
-        if (mCursor != null) {
+        if (mCursor != null && mCursor.getCount() > 0) {
             SongListAdapter mAdapter = new SongListAdapter(mCursor, new WeakReference<Context>(this));
             mPlaylist.getPlaylist().setAdapter(mAdapter);
             mAdapter.setItemClickListner(this);
@@ -223,6 +221,11 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
         mHandler.postDelayed(mRunnable, 100);
         mDiskPlayer.resume();
         mWaveformView.updateAmplitude(1f, false);
+    }
+
+    @Override
+    public void onMediaStart() {
+        Log.e("onMediaStart", "-------------");
     }
 
     @Override

@@ -11,5 +11,7 @@ public interface MediaCallback {
 
     void onMediaResumed();
 
+    void onMediaStart();
+
     void onAlbumEnd();
 }

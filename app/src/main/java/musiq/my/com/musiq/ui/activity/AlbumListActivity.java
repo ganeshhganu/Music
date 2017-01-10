@@ -89,10 +89,13 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
         if (mStreamingService != null) {
             Cursor cursor = mStreamingService.getCursor();
             if (cursor != null) {
-                cursor.moveToPosition(PreferenceManager.getInt(this, AppConstants.POSITION));
-                mTrackName.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)));
-                mTrackName.setSelected(true);
-                cursor.close();
+                int currentPosition = PreferenceManager.getInt(this, AppConstants.POSITION);
+                if (currentPosition > -1) {
+                    cursor.moveToPosition(currentPosition);
+                    mTrackName.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)));
+                    mTrackName.setSelected(true);
+                    cursor.close();
+                }
             }
         }
     }

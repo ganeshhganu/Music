@@ -39,7 +39,6 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
 
     private MediaPlayer mMediaPlayer;
     private IBinder mBinder = new LocalBinder();
-    private int mCurrentPosition;
     private MediaCallback mMediaCallback;
     private boolean isAutoChange = true;
     private TelephonyManager mgr;
@@ -115,10 +114,15 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+
         mp.start();
         mMediaPlayer.setOnCompletionListener(this);
         if (!isAutoChange) {
             onCompletion(mp);
+        }
+
+        if (mMediaCallback != null) {
+            mMediaCallback.onMediaStart();
         }
     }
 
@@ -149,36 +153,40 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     }
 
     public void start(int mediaID, int albumID, int mCurrentPosition) {
-        try {
-            if (mediaID != -1) {
-                PreferenceManager.setBoolean(getApplicationContext(), AppConstants.IS_PLAYING, true);
-                PreferenceManager.setInt(getApplicationContext(), AppConstants.ALBUM_ID, albumID);
-                PreferenceManager.setInt(getApplicationContext(), AppConstants.MEDIA_ID, mediaID);
-                PreferenceManager.setInt(getApplicationContext(), AppConstants.POSITION, mCurrentPosition);
-                Cursor cursor = getCursor();
-                if (cursor != null &&
-                        cursor.getCount() > 0 &&
-                        cursor.moveToPosition(mCurrentPosition)) {
-                    String artistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST));
-                    String trackName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-                    initNotificationBuilder(trackName, artistName);
-                }
-                Uri contentUri = ContentUris.withAppendedId(
-                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mediaID);
-
-                if (mMediaPlayer != null) {
-                    mMediaPlayer.stop();
-                    mMediaPlayer.reset();
-                    mMediaPlayer.setOnPreparedListener(this);
-                    mMediaPlayer.setOnSeekCompleteListener(this);
-                    mMediaPlayer.setOnErrorListener(this);
-
-                    mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mMediaPlayer.setDataSource(getApplicationContext(), contentUri);
-                    mMediaPlayer.prepareAsync();
-                }
+        if (mediaID != -1) {
+            PreferenceManager.setBoolean(getApplicationContext(), AppConstants.IS_PLAYING, true);
+            PreferenceManager.setInt(getApplicationContext(), AppConstants.ALBUM_ID, albumID);
+            PreferenceManager.setInt(getApplicationContext(), AppConstants.MEDIA_ID, mediaID);
+            PreferenceManager.setInt(getApplicationContext(), AppConstants.POSITION, mCurrentPosition);
+            Cursor cursor = getCursor();
+            if (cursor != null &&
+                    cursor.getCount() > 0 &&
+                    cursor.moveToPosition(mCurrentPosition)) {
+                String artistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST));
+                String trackName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                initNotificationBuilder(trackName, artistName);
             }
+            Uri contentUri = ContentUris.withAppendedId(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mediaID);
 
+            initMediaPlayer(contentUri);
+        }
+
+    }
+
+    private void initMediaPlayer(Uri contentUri) {
+        try {
+            if (mMediaPlayer != null) {
+                mMediaPlayer.stop();
+                mMediaPlayer.reset();
+                mMediaPlayer.setOnPreparedListener(this);
+                mMediaPlayer.setOnSeekCompleteListener(this);
+                mMediaPlayer.setOnErrorListener(this);
+
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                mMediaPlayer.setDataSource(getApplicationContext(), contentUri);
+                mMediaPlayer.prepareAsync();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -193,7 +201,6 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
             if (mMediaCallback != null) {
                 mMediaCallback.onMediaPaused();
             }
-            mCurrentPosition = mMediaPlayer.getCurrentPosition();
         }
     }
 
@@ -201,9 +208,11 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
         if (mMediaPlayer != null) {
             PreferenceManager.setBoolean(getApplicationContext(), AppConstants.IS_PLAYING, true);
             isPaused = false;
-            if (mCurrentPosition != 0) {
+            /*if (mCurrentPosition != 0) {
                 mMediaPlayer.seekTo(mCurrentPosition);
-            }
+            }else{
+                mMediaPlayer.stop();
+            }*/
             if (mMediaCallback != null) {
                 mMediaCallback.onMediaResumed();
             }
@@ -217,6 +226,7 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
             mMediaPlayer.stop();
             mMediaPlayer.release();
         }
+        PreferenceManager.setBoolean(getApplicationContext(), AppConstants.IS_PLAYING, false);
     }
 
     public void seekTo(int position) {
@@ -317,4 +327,5 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
         // mId allows you to update the notification later on.
         mNotificationManager.notify(111, mBuilder.build());
     }
+
 }
