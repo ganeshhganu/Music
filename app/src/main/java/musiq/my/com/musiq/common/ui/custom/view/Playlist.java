@@ -36,6 +36,8 @@ public class Playlist extends RelativeLayout implements GestureDetector.OnGestur
     private ImageView mDrawer;
     private ImageView mPlay;
     private StreamingService mService;
+    private ImageView mNextTrack;
+    private ImageView mPreviousTrack;
 
     public Playlist(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,8 +55,8 @@ public class Playlist extends RelativeLayout implements GestureDetector.OnGestur
         super.onFinishInflate();
         mContainer = (RelativeLayout) findViewById(R.id.container);
         mDrawer = (ImageView) findViewById(R.id.drawer_background);
-        ImageView mPreviousTrack = (ImageView) findViewById(R.id.previous);
-        ImageView mNextTrack = (ImageView) findViewById(R.id.next);
+        mPreviousTrack = (ImageView) findViewById(R.id.previous);
+        mNextTrack = (ImageView) findViewById(R.id.next);
         mPlay = (ImageView) findViewById(R.id.pause);
         mPlaylist = (RecyclerView) findViewById(R.id.playlist);
         mPlaylist.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -159,53 +161,65 @@ public class Playlist extends RelativeLayout implements GestureDetector.OnGestur
         });
     }
 
+    public void performPrevious() {
+        int currentPosition = PreferenceManager.getInt(getContext(), AppConstants.POSITION) - 1;
+        if (currentPosition != -1) {
+            int albumId = PreferenceManager.getInt(getContext(), AppConstants.ALBUM_ID);
+            Cursor preCursor = Utils.getSongsInAlbum(getContext(), albumId);
+            preCursor.moveToPosition(currentPosition);
+            /**
+             * To override on complete
+             */
+            mService.setAutoChange(false);
+            mService.start(preCursor.getInt(preCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
+                    albumId,
+                    currentPosition);
+        }
+    }
+
+    public void performNext() {
+
+        int currentPosition = PreferenceManager.getInt(getContext(), AppConstants.POSITION) + 1;
+        int albumId = PreferenceManager.getInt(getContext(), AppConstants.ALBUM_ID);
+        Cursor nextCursor = Utils.getSongsInAlbum(getContext(), albumId);
+        if (nextCursor.getCount() > currentPosition) {
+            nextCursor.moveToPosition(currentPosition);
+            /**
+             * To override on complete
+             */
+            mService.setAutoChange(false);
+            mService.start(nextCursor.getInt(nextCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
+                    albumId,
+                    currentPosition);
+        }
+    }
+
+    public void performPause() {
+        if (mService != null) {
+            if (mService.isPlaying()) {
+                mPlay.setImageResource(R.drawable.ic_fab_play);
+                mService.pause();
+            } else {
+                mPlay.setImageResource(R.drawable.ic_fab_pause);
+                mService.resume();
+            }
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
 
             case R.id.next:
-
-                int currentPosition = PreferenceManager.getInt(getContext(), AppConstants.POSITION) + 1;
-                int albumId = PreferenceManager.getInt(getContext(), AppConstants.ALBUM_ID);
-                Cursor nextCursor = Utils.getSongsInAlbum(getContext(), albumId);
-                if (nextCursor.getCount() > currentPosition) {
-                    nextCursor.moveToPosition(currentPosition);
-                    /**
-                     * To override on complete
-                     */
-                    mService.setAutoChange(false);
-                    mService.start(nextCursor.getInt(nextCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
-                            albumId,
-                            currentPosition);
-                }
+                performNext();
                 break;
 
             case R.id.previous:
-                currentPosition = PreferenceManager.getInt(getContext(), AppConstants.POSITION) - 1;
-                if (currentPosition != -1) {
-                    albumId = PreferenceManager.getInt(getContext(), AppConstants.ALBUM_ID);
-                    Cursor preCursor = Utils.getSongsInAlbum(getContext(), albumId);
-                    preCursor.moveToPosition(currentPosition);
-                    /**
-                     * To override on complete
-                     */
-                    mService.setAutoChange(false);
-                    mService.start(preCursor.getInt(preCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
-                            albumId,
-                            currentPosition);
-                }
+                performPrevious();
                 break;
 
             case R.id.pause:
-                if (mService != null) {
-                    if (mService.isPlaying()) {
-                        mPlay.setImageResource(R.drawable.ic_fab_play);
-                        mService.pause();
-                    } else {
-                        mPlay.setImageResource(R.drawable.ic_fab_pause);
-                        mService.resume();
-                    }
-                }
+                performPause();
                 break;
         }
         toggleDrawer(true);

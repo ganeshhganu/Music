@@ -8,6 +8,7 @@ import android.net.Uri;
 
 public class AppConstants {
 
+    public static final String IS_PLAYING = "IS_PLAYING";
     public static final String MEDIA_ID  = "MEDIA_ID";
     public static final String ALBUM_ID  = "ALBUM_ID";
     public static final String ALBUM_NAME  = "ALBUM_NAME";

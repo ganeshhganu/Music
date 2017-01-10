@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 
@@ -47,7 +48,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     private Cursor mCursor;
     private ProgressBar mTrackProgress;
     private Playlist mPlaylist;
-    private SongListAdapter mAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +68,26 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
         mTrackProgress = (ProgressBar) findViewById(R.id.track_progress);
         mPlaylist = (Playlist) findViewById(R.id.playlist_view);
 
+        ImageView mPrevious = (ImageView) findViewById(R.id.previous);
+        ImageView mNext = (ImageView) findViewById(R.id.next);
+        ImageView mPause = (ImageView) findViewById(R.id.pause);
+
+        if (mPrevious != null) {
+            mPrevious.setOnClickListener(this);
+        }
+
+        if (mNext != null) {
+            mNext.setOnClickListener(this);
+        }
+
+        if (mPause != null) {
+            mPause.setOnClickListener(this);
+        }
+
+
         mTrackProgress.setMax(100);
         mDiskPlayer.setMediaCallback(this);
         mHandler = new Handler();
-
-        Launcher.launchPlayerService(this, getIntent(), this);
     }
 
     final Runnable mRunnable = new Runnable() {
@@ -108,11 +124,15 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
             mService = ((StreamingService.LocalBinder) service).getService();
             mService.setMediaCallback(this);
 
-            if (!mService.isPlaying() || PreferenceManager.getInt(getApplicationContext(), AppConstants.MEDIA_ID) !=
+            if (PreferenceManager.getInt(getApplicationContext(), AppConstants.MEDIA_ID) !=
                     getIntent().getIntExtra(AppConstants.MEDIA_ID, -1)) {
                 mService.start(getIntent().getIntExtra(AppConstants.MEDIA_ID, -1),
                         getIntent().getIntExtra(AppConstants.ALBUM_ID, -1),
                         getIntent().getIntExtra(AppConstants.POSITION, -1));
+            } else {
+                if (!PreferenceManager.getBoolean(this, AppConstants.IS_PLAYING)) {
+                    mService.resume();
+                }
             }
             updateUi();
         }
@@ -124,7 +144,7 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
 
         mCursor = mService.getCursor();
         if (mCursor != null) {
-            mAdapter = new SongListAdapter(mCursor, new WeakReference<Context>(this));
+            SongListAdapter mAdapter = new SongListAdapter(mCursor, new WeakReference<Context>(this));
             mPlaylist.getPlaylist().setAdapter(mAdapter);
             mAdapter.setItemClickListner(this);
 
@@ -161,6 +181,16 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
         if (mService != null && mService.isPlaying()) {
             mDiskPlayer.resume();
         }
+    }
+
+    @Override
+    public void onPermissionDenied() {
+        Toast.makeText(this, "Grant storage permission", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPermissionGranted() {
+        Launcher.launchPlayerService(this, getIntent(), this);
     }
 
     @Override
@@ -201,7 +231,17 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.next:
+                mPlaylist.performNext();
+                break;
 
+            case R.id.previous:
+                mPlaylist.performPrevious();
+                break;
+
+            case R.id.pause:
+                mPlaylist.performPause();
+                break;
         }
     }
 

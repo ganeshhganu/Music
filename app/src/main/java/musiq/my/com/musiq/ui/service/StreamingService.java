@@ -9,6 +9,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -20,7 +21,6 @@ import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import java.io.IOException;
 
@@ -45,6 +45,9 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     private TelephonyManager mgr;
     private boolean isPaused;
     private NotificationManager mNotificationManager;
+    private NotificationCompat.Builder mBuilder;
+    private static final String TRACK_NAME = "Track Name : %s";
+    private static final String ARTIST_NAME = "Artist : %s";
 
     public StreamingService() {
     }
@@ -52,10 +55,10 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     @Override
     public IBinder onBind(Intent intent) {
         mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        mBuilder = new NotificationCompat.Builder(this);
         if (mgr != null) {
             mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         }
-        initNotificationBuilder();
         return mBinder;
     }
 
@@ -148,10 +151,18 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     public void start(int mediaID, int albumID, int mCurrentPosition) {
         try {
             if (mediaID != -1) {
+                PreferenceManager.setBoolean(getApplicationContext(), AppConstants.IS_PLAYING, true);
                 PreferenceManager.setInt(getApplicationContext(), AppConstants.ALBUM_ID, albumID);
                 PreferenceManager.setInt(getApplicationContext(), AppConstants.MEDIA_ID, mediaID);
                 PreferenceManager.setInt(getApplicationContext(), AppConstants.POSITION, mCurrentPosition);
-
+                Cursor cursor = getCursor();
+                if (cursor != null &&
+                        cursor.getCount() > 0 &&
+                        cursor.moveToPosition(mCurrentPosition)) {
+                    String artistName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST));
+                    String trackName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                    initNotificationBuilder(trackName, artistName);
+                }
                 Uri contentUri = ContentUris.withAppendedId(
                         android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, mediaID);
 
@@ -176,6 +187,7 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
     public void pause() {
         if (mMediaPlayer != null &&
                 mMediaPlayer.isPlaying()) {
+            PreferenceManager.setBoolean(getApplicationContext(), AppConstants.IS_PLAYING, false);
             isPaused = true;
             mMediaPlayer.pause();
             if (mMediaCallback != null) {
@@ -187,6 +199,7 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
 
     public void resume() {
         if (mMediaPlayer != null) {
+            PreferenceManager.setBoolean(getApplicationContext(), AppConstants.IS_PLAYING, true);
             isPaused = false;
             if (mCurrentPosition != 0) {
                 mMediaPlayer.seekTo(mCurrentPosition);
@@ -269,25 +282,18 @@ public class StreamingService extends Service implements AudioManager.OnAudioFoc
         }
     };
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void initNotificationBuilder() {
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void initNotificationBuilder(String trackName, String artistName) {
 
-        RemoteViews remoteViews = new RemoteViews(getPackageName(),
-                R.layout.notification_inflater);
-
-        Intent yesReceive = new Intent();
-        yesReceive.setAction("YES_ACTION");
-        PendingIntent pendingIntentYes = PendingIntent.getBroadcast(this, 12345, yesReceive, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_logo)
-                        .setOngoing(true)
-                        /*.addAction(R.drawable.btn_playback_rew_normal_jb_dark_translucent, "Yes", pendingIntentYes)
-                        .addAction(R.drawable.ic_fab_pause, "Yes", pendingIntentYes)
-                        .addAction(R.drawable.btn_playback_ff_normal_jb_dark_translucent, "Yes", pendingIntentYes)*/
-                        .setContent(remoteViews);
+        mBuilder.setSmallIcon(R.drawable.ic_logo)
+                .setOngoing(true)
+                .setContentTitle(String.format(TRACK_NAME, trackName))
+                .setContentText(String.format(ARTIST_NAME, artistName))
+                .setLargeIcon(((BitmapDrawable) getApplicationContext().getDrawable(R.drawable.bg_default_album_art)).getBitmap())
+                .setSmallIcon(R.drawable.bg_default_album_art)
+                .addAction(R.drawable.ic_skip_previous_black_24dp, null, null)
+                .addAction(R.drawable.ic_play_arrow_black_24dp, null, null)
+                .addAction(R.drawable.ic_skip_next_black_24dp, null, null);
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, PlayerActivity.class);
 

@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.View;
+import android.widget.Toast;
 
 import musiq.my.com.musiq.R;
 import musiq.my.com.musiq.common.AppConstants;
@@ -20,6 +21,7 @@ import musiq.my.com.musiq.ui.adapter.AlbumListAdapter;
 public class AlbumListActivity extends BaseActivity implements View.OnClickListener {
 
     private String TAG = "AlbumListActivity";
+    private RecyclerView mSongList;
 
 
     @Override
@@ -30,15 +32,13 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void init() {
-        Cursor cursor = Utils.getAudioList(this);
-        RecyclerView mSongList = (RecyclerView) findViewById(R.id.song_list);
+        mSongList = (RecyclerView) findViewById(R.id.song_list);
         FloatingActionButton mNowPlaying = (FloatingActionButton) findViewById(R.id.now_playing);
         mNowPlaying.setOnClickListener(this);
         Display getOrient = getWindowManager().getDefaultDisplay();
         int orientation = getOrient.getRotation();
-        int gridSize = (orientation ==1||orientation ==3)?3:2;
+        int gridSize = (orientation == 1 || orientation == 3) ? 3 : 2;
         mSongList.setLayoutManager(new GridLayoutManager(this, gridSize));
-        mSongList.setAdapter(new AlbumListAdapter(cursor));
     }
 
     @Override
@@ -53,5 +53,16 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
                 Launcher.launchPlayer(this, intent);
                 break;
         }
+    }
+
+    @Override
+    public void onPermissionDenied() {
+        Toast.makeText(this, "Grant storage permission", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPermissionGranted() {
+        Cursor cursor = Utils.getAudioList(this);
+        mSongList.setAdapter(new AlbumListAdapter(cursor));
     }
 }

@@ -36,5 +36,17 @@ public class PreferenceManager {
         return preferences.getInt(key, -1);
     }
 
+    public static void setBoolean(Context ctx, String key, boolean value) {
+        SharedPreferences.Editor preferences = getPreferenceEditor(ctx);
+        preferences.putBoolean(key, value);
+        preferences.apply();
+    }
+
+    public static boolean getBoolean(Context ctx, String key) {
+        SharedPreferences preferences = getPreference(ctx);
+        return preferences.getBoolean(key, true);
+    }
+
+
 
 }
