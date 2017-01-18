@@ -66,4 +66,8 @@ public class SongCard extends LinearLayout{
         mAlbumArt.loadImage(uri);
         return this;
     }
+
+    public GlideImageView getImageView(){
+        return mAlbumArt;
+    }
 }

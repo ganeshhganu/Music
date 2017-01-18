@@ -6,4 +6,5 @@
     <string name="now_playing">Now Playing</string>
     <string name="now_playing_colon">Now Playing :</string>
     <string name="search">Search</string>
+    <string name="grant_permission">Grant storage permission</string>
 </resources>

@@ -68,13 +68,13 @@ public class AlbumListActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void onPermissionDenied() {
-        Toast.makeText(this, "Grant storage permission", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.grant_permission), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPermissionGranted() {
         Cursor cursor = Utils.getAudioList(this);
-        mSongList.setAdapter(new AlbumListAdapter(cursor));
+        mSongList.setAdapter(new AlbumListAdapter(this, cursor));
         Launcher.launchPlayerService(this, getIntent(), this);
     }
 
