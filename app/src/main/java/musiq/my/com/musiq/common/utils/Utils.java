@@ -45,13 +45,15 @@ public class Utils {
 
 
     public static void loadBlurImage(Context context, Uri uri, ImageView imageView){
-        Glide.with(context)
-                .load(uri)
-                .centerCrop()
-                .bitmapTransform(new BlurTransformation(context))
-                .placeholder(R.drawable.bg_default_album_art)
-                .crossFade()
-                .into(imageView);
+        if (context != null) {
+            Glide.with(context)
+                    .load(uri)
+                    .centerCrop()
+                    .bitmapTransform(new BlurTransformation(context))
+                    .placeholder(R.drawable.bg_default_album_art)
+                    .crossFade()
+                    .into(imageView);
+        }
     }
 
     public static void loadImage(Context context, Uri uri, ImageView imageView){

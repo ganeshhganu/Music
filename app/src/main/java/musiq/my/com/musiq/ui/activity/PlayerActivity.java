@@ -1,5 +1,6 @@
 package musiq.my.com.musiq.ui.activity;
 
+import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -12,8 +13,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -110,11 +113,17 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
     private void loadBackgroundImage() {
         final Uri sArtworkUri = Uri
                 .parse("content://media/external/audio/albumart");
+
+
         if (mCursor != null && mCursor.getCount() > 0) {
             Uri uri = ContentUris.withAppendedId(sArtworkUri, mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ID)));
             Utils.loadBlurImage(this, uri, mBigAlbumArt);
             Utils.loadBlurImage(this, uri, mPlaylist.getDrawer());
             mDiskPlayer.loadRoundImage(this, uri);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            prepareRevealEffect();
         }
         mDiskPlayer.startAnimate();
     }
@@ -266,5 +275,23 @@ public class PlayerActivity extends BaseActivity implements ServiceConnection,
             onSongChange();
             mPlaylist.toggleDrawer(true);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void prepareRevealEffect() {
+
+        // get the center for the clipping circle
+        int cx = mBigAlbumArt.getWidth();
+        int cy = mBigAlbumArt.getHeight();
+
+        // get the final radius for the clipping circle
+        float finalRadius = (float) Math.hypot(cx, cy);
+
+        // create the animator for this view (the start radius is zero)
+        Animator anim = ViewAnimationUtils.createCircularReveal(mBigAlbumArt, cx, cy, 0, finalRadius);
+        anim.setDuration(1000);
+        // make the view visible and start the animation
+        mBigAlbumArt.setVisibility(View.VISIBLE);
+        anim.start();
     }
 }
