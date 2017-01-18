@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -67,7 +68,15 @@ public class SongCard extends LinearLayout{
         return this;
     }
 
-    public GlideImageView getImageView(){
+    public View getImageView(){
         return mAlbumArt;
+    }
+
+    public View getTotalSongsView(){
+        return mTotalSongs;
+    }
+
+    public View getAlbumNameView(){
+        return mAlbumName;
     }
 }

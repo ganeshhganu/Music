@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +55,10 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
 
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                             ActivityOptions options = ActivityOptions
-                                    .makeSceneTransitionAnimation(mActivity.get(), holder.songCard.getImageView(), "robot");
+                                    .makeSceneTransitionAnimation(mActivity.get(),
+                                            Pair.create(holder.songCard.getImageView(), "album_art"),
+                                            Pair.create(holder.songCard.getAlbumNameView(), "title"),
+                                            Pair.create(holder.songCard.getTotalSongsView(), "total_songs"));
                             Launcher.launchSongList(v.getContext(), intent, options);
                         }
 
